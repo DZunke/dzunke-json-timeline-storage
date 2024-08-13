@@ -6,17 +6,28 @@ namespace DZunke\PanalyJsonTimelineStorage\Test;
 
 use DZunke\PanalyJsonTimelineStorage\JsonTimelineStoragePlugin;
 use DZunke\PanalyJsonTimelineStorage\TimelineStorage;
+use Panaly\Configuration\ConfigurationFile;
+use Panaly\Configuration\RuntimeConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class JsonTimelineStoragePluginTest extends TestCase
 {
     public function testThatStorageIsRegistered(): void
     {
-        $plugin = new JsonTimelineStoragePlugin();
+        $configurationFile    = $this->createMock(ConfigurationFile::class);
+        $runtimeConfiguration = $this->createMock(RuntimeConfiguration::class);
 
-        $storages = $plugin->getAvailableStorages([]);
+        $matcher = $this->exactly(1);
 
-        self::assertCount(1, $storages);
-        self::assertInstanceOf(TimelineStorage::class, $storages[0]);
+        $runtimeConfiguration->expects($matcher)
+            ->method('addStorage')
+            ->willReturnCallback(static function (object $metric) use ($matcher): void {
+                match ($matcher->numberOfInvocations()) {
+                    1 => self::assertInstanceOf(TimelineStorage::class, $metric),
+                    default => self::fail('Too much is going on here!'),
+                };
+            });
+
+        (new JsonTimelineStoragePlugin())->initialize($configurationFile, $runtimeConfiguration, []);
     }
 }

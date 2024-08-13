@@ -29,6 +29,7 @@ readonly class InputOptions
         }
     }
 
+    /** @param array<string, mixed> $options */
     public static function fromArray(array $options): InputOptions
     {
         $targetPath = $options['directory'] ?? null;

@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace DZunke\PanalyJsonTimelineStorage;
 
-use Panaly\Plugin\BasePlugin;
+use Panaly\Configuration\ConfigurationFile;
+use Panaly\Configuration\RuntimeConfiguration;
+use Panaly\Plugin\Plugin;
 
-final class JsonTimelineStoragePlugin extends BasePlugin
+final class JsonTimelineStoragePlugin implements Plugin
 {
     /** @inheritDoc */
-    public function getAvailableStorages(array $options): array
-    {
-        return [new TimelineStorage()];
+    public function initialize(
+        ConfigurationFile $configurationFile,
+        RuntimeConfiguration $runtimeConfiguration,
+        array $options,
+    ): void {
+        $runtimeConfiguration->addStorage(new TimelineStorage());
     }
 }
